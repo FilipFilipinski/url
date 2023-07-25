@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.execute(
         """--sql
             CREATE TABLE users(
-                uid uuid DEFAULT uuid_generate_v4 (),
+                uid uuid DEFAULT uuid_generate_v4(),
                 
                 email text NOT NULL,
                 password text NOT NULL, 
@@ -30,7 +30,7 @@ def upgrade() -> None:
                 
                 created_at timestamp with time zone NOT NULL,
                 
-                PRIMARY KEY (id)
+                PRIMARY KEY (uid)
                );
        """
     )
