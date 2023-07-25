@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.execute(
         """--sql
             CREATE TABLE users(
-                uid uuid DEFAULT uuid_generate_v4(),
+                uid uuid DEFAULT gen_random_uuid(),
                 
                 email text NOT NULL,
                 password text NOT NULL, 
