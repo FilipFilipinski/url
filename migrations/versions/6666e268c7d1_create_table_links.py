@@ -6,8 +6,7 @@ Revision ID: 6666e268c7d1
 Creation date: 2023-07-25 18:34:32.790850
 
 """
-from alembic import op, context
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "6666e268c7d1"
@@ -20,7 +19,7 @@ def upgrade() -> None:
     op.execute(
         """--sql
         CREATE TABLE links(
-            lid UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+            l_uid UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             owner_uid UUID NOT NULL,
             
             original_link TEXT NOT NULL,
@@ -35,6 +34,7 @@ def upgrade() -> None:
         );
         """
     )
+
 
 def downgrade() -> None:
     op.execute(
