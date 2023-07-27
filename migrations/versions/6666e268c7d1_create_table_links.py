@@ -21,15 +21,15 @@ def upgrade() -> None:
         CREATE TABLE links(
             l_uid UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             owner_uid UUID NOT NULL,
-            
+
             original_link TEXT NOT NULL,
             short_link TEXT NOT NULL,
-            protected BOOLEAN NOT NULL, 
+            protected BOOLEAN NOT NULL,
             password TEXT,
-            
+
 
             created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-            
+
             CONSTRAINT fk_user FOREIGN KEY(owner_uid) REFERENCES users(uid) ON DELETE CASCADE
         );
         """
