@@ -13,11 +13,10 @@ class Context:
         from aiohttp import web
 
         from src.repos.link_repo import LinkRepository
-        from src.repos.user_repo import UserRepository
         from src.repos.stat_repo import StatRepository
-
+        from src.repos.user_repo import UserRepository
+        from src.routes.health_controller import HealthController
         from src.routes.link_controller import LinkController
-
         from src.service.database.dbpool import DBPool
 
         Context.context = self
@@ -32,6 +31,7 @@ class Context:
 
         # controllers
         self.controllers = [
+            HealthController(self.db),
             LinkController(self.link_repo),
         ]
 
