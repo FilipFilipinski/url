@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from argon2 import PasswordHasher
 
 """
@@ -9,7 +10,7 @@ Revision ID: b2d1400908a1
 Creation date: 2023-07-23 22:11:38.490752
 
 """
-from alembic import op, context
+from alembic import context, op
 
 # revision identifiers, used by Alembic.
 revision = "b2d1400908a1"
@@ -23,13 +24,13 @@ def upgrade() -> None:
         """--sql
             CREATE TABLE users(
                 uid uuid DEFAULT gen_random_uuid(),
-                
+
                 email text NOT NULL,
-                password text NOT NULL, 
+                password text NOT NULL,
                 username text NOT NULL,
-                
+
                 created_at timestamp with time zone NOT NULL,
-                
+
                 PRIMARY KEY (uid)
                );
        """
