@@ -5,3 +5,24 @@ info:
 
 
 paths:
+  /api/v1/health:
+    get:
+      description: Returns health status of all app services
+      responses:
+        200:
+          description: All services are healthy and working.
+          content:
+            application/json:
+              examples:
+                healthy:
+                  summary: Services are properly working
+                  value: { "status": "healthy","services": { "db": "ok" } }
+
+        503:
+          description: Some services can have degraded performance or can be unreachable.
+          content:
+            application/json:
+              examples:
+                healthy:
+                  summary: Services are not properly working
+                  value: { "status": "unhealthy","services": { "db": "fail" } }
