@@ -11,7 +11,6 @@ ph = PasswordHasher()
 
 
 class UserRepository(DB):
-
     async def create(self, email: str, password: str, username: str) -> User | None:
         """
         Creates a new record in users table.
@@ -23,7 +22,6 @@ class UserRepository(DB):
         Returns:
           user (User): User's object
         """
-
         # Ensure that we won't be overwriting existing user
         user = await self.find(email=email)
         if user:
@@ -32,7 +30,6 @@ class UserRepository(DB):
         if password:
             # Hash given password using argon2
             password = ph.hash(str(password))
-
         user = User(email=email, password=password, username=username, date=datetime.now())
         return await self.save(user)
 
@@ -43,7 +40,7 @@ class UserRepository(DB):
 
         Parameters:
           email (int|Optional): User's phone
-          uid (int|Optional): User uid
+          uid (UUID|Optional): User uid
 
         Returns:
           user (User | None): User's object or None
@@ -122,6 +119,86 @@ class UserRepository(DB):
                 user.email,
                 user.password,
                 user.username,
-                user.date
+                user.date,
             )
         return User.parse_obj(u)
+
+    # admin panel
+    @DB._call
+    async def search(self, conn: Connection, phrase: str, page: int, per_page: int) -> [User]:
+        """
+        Returns list of users by phrase.
+
+           Parameters:
+             phrase (str)
+             page (int)
+             per_page (int)
+
+           Returns:
+               [Users]
+        """
+
+        resp = await conn.fetch(
+            """--sql
+            SELECT * FROM users WHERE LOWER(firstname) LIKE $1 OR
+            LOWER(email) LIKE $1 OR LOWER(username) LIKE $1
+            ORDER BY created_at DESC LIMIT $2 OFFSET $3
+            """,
+            f"%{phrase.lower()}%",
+            per_page,
+            (page - 1) * per_page,
+        )
+        return [User(**user) for user in resp]
+
+    @DB._call
+    async def change_admin_status(self, conn: Connection, uid: UUID = None) -> bool:
+        """
+        Change admin status to the opposite.
+
+        Parameters:
+          uid (UUID): User's uid
+
+        Returns:
+          result (bool): True if User is admin or False if not
+        """
+        if not await self.find(uid=uid):
+            return False
+
+        admin = await conn.fetchval(
+            """--sql
+            UPDATE users
+            SET admin = NOT admin
+            WHERE uid = $1
+            RETURNING admin
+            """,
+            uid,
+        )
+
+        return admin
+
+    @DB._call
+    async def next_page_exists(self, conn: Connection, phrase: str, page: int, per_page: int) -> bool:
+        """
+        Find out if next page exists
+           Parameters:
+             phrase (str)
+             page (int)
+             per_page (int)
+
+           Returns:
+               wether next page with users can be found or not(bool)
+
+        """
+
+        count = await conn.fetchval(
+            """--sql
+            SELECT count(*) FROM (SELECT * FROM users WHERE surname
+            LIKE $1 OR phone LIKE $1 OR mail LIKE $1
+            LIMIT $2 OFFSET $3) subquery
+            """,
+            "%" + phrase + "%",
+            per_page,
+            page * per_page,
+        )
+
+        return count > 0
