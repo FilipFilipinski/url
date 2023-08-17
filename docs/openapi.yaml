@@ -26,3 +26,167 @@ paths:
                 healthy:
                   summary: Services are not properly working
                   value: { "status": "unhealthy","services": { "db": "fail" } }
+
+  /api/v1/me:
+    get:
+      description: Returns data about user by the token.
+      parameters:
+        - in: header
+          name: "Authorization: Bearer {token}"
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Operation successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/v1/user:
+    get:
+      tags:
+        - Admin
+      description: Returns all users - function only available for admin.
+      parameters:
+        - in: header
+          name: "Authorization: Bearer {token}"
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Operation successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/User'
+                    - $ref: '#/components/schemas/User'
+    post:
+      description: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User_password"
+      responses:
+        200:
+          description: Operation successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessToken"
+
+  /api/v1/user/{user_uid}:
+    get:
+      tags:
+        - Admin
+      description: Returns data about user by id.
+      parameters:
+        - in: header
+          name: "Authorization: Bearer {token}"
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Operation successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      description: delete user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User_password"
+      responses:
+        200:
+          description: Operation successful.
+          content:
+            application/json:
+              examples:
+                healthy:
+                  value: {
+                    "message": "User was successfully removed"
+                  }
+components:
+  schemas:
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+        services:
+          type: object
+          properties:
+            service:
+              type: string
+              enum:
+                - ok
+                - fail
+    AccessToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Access token
+        user:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          description: Date when token was created
+
+    User:
+      type: object
+      properties:
+        uid:
+          type: string
+          description: User's ID
+        admin:
+          type: boolean
+          description: True if user's admin
+        email:
+          type: string
+          description: The user email
+        username:
+          type: string
+          description: The user name
+        created_at:
+          type: string
+          description: Date when user was created
+
+    User_password:
+      type: object
+      properties:
+        uid:
+          type: string
+          description: User's ID
+        admin:
+          type: boolean
+          description: True if user is admin
+        email:
+          type: string
+          description: The user email
+        password:
+          type: string
+          description: The user password
+        username:
+          type: string
+          description: The user name
+        created_at:
+          type: string
+          description: Date when user was created
