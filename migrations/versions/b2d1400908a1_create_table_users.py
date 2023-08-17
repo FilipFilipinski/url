@@ -24,6 +24,7 @@ def upgrade() -> None:
         """--sql
             CREATE TABLE users(
                 uid uuid DEFAULT gen_random_uuid(),
+                admin BOOLEAN NOT NULL DEFAULT false,
 
                 email text NOT NULL,
                 password text NOT NULL,
