@@ -2,12 +2,18 @@ import asyncio
 import os
 
 import pytest
+from argon2 import PasswordHasher
 from dotenv import load_dotenv
+from faker import Faker
 from loguru import logger
 
 from src.app import async_app_factory
 from src.repos.user_repo import UserRepository
 from src.service.database.dbpool import DBPool
+from tests.common import random_string
+
+faker = Faker()
+ph = PasswordHasher()
 
 
 @pytest.fixture(scope="session")
@@ -42,3 +48,13 @@ async def db():
 async def user_repo(db: DBPool):
     repo = UserRepository(db)
     return repo
+
+
+@pytest.fixture(scope="module", autouse=True)
+async def example_user(user_repo: UserRepository):
+    username = str(faker.first_name())
+    email = faker.email()
+    password = random_string()
+    user = await user_repo.create(email=email, password=password, username=username)
+    yield user
+    await user_repo.delete(user.uid)
