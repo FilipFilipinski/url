@@ -1,10 +1,12 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
 from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 
 class User(BaseModel):
     uid: UUID | None
+    admin: bool = False
     email: str
     password: str
     username: str
