@@ -3,6 +3,7 @@ from datetime import datetime
 from argon2 import PasswordHasher
 from faker import Faker
 
+from src.models.user import User
 from src.repos.user_repo import UserRepository
 from tests.common import random_string
 
@@ -28,3 +29,13 @@ async def test_can_create_user(user_repo: UserRepository):
     await user_repo.delete(uid=user.uid)
 
     assert await user_repo.find(uid=user.uid) is None
+
+
+async def test_can_change_admin(user_repo: UserRepository, example_user: User):
+    assert example_user.admin is False
+
+    await user_repo.change_admin_status(example_user.uid)
+    assert (await user_repo.find(uid=example_user.uid)).admin is True
+
+    await user_repo.change_admin_status(example_user.uid)
+    assert (await user_repo.find(uid=example_user.uid)).admin is False
