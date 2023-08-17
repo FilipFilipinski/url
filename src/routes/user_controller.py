@@ -16,8 +16,8 @@ class UserController:
                 web.get("/api/v1/me", self.get_user_info),
                 web.get("/api/v1/user", self.all_users),
                 web.post("/api/v1/user", self.create_user),
-                web.get("/api/v1/user/{user_id}", self.get_user),
-                web.delete("/api/v1/user/{user_id}", self.delete_user),
+                web.get("/api/v1/user/{user_uid}", self.get_user),
+                web.delete("/api/v1/user/{user_uid}", self.delete_user),
             ]
         )
 
