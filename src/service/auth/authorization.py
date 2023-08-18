@@ -18,7 +18,7 @@ class AuthorizationService:
         self.user_repo = user_repo
         self.token_repo = token_repo
 
-    async def login(self, username: str, password: str) -> AccessToken | None:
+    async def login(self, email: str, password: str) -> AccessToken | None:
         """
         This method returns create a brand-new token
         that user can use to access API.
@@ -27,14 +27,14 @@ class AuthorizationService:
         tokens.
 
         Parameters:
-          username (str): User's username
+          email (str): User's email
           password (str): User's password
 
         Returns:
           access_token (AccessToken): Authorization token
         """
 
-        user = await self.user_repo.find(username=username)
+        user = await self.user_repo.find(email=email)
         if not user:
             return None
 
@@ -60,8 +60,7 @@ class AuthorizationService:
         Returns:
           access_token (AccessToken): Authorization token
         """
-
-        user = await self.user_repo.create(email, username, password)
+        user = await self.user_repo.create(email=email, password=password, username=username)
         if not user:
             return None
 
