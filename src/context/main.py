@@ -14,9 +14,12 @@ class Context:
 
         from src.repos.link_repo import LinkRepository
         from src.repos.stat_repo import StatRepository
+        from src.repos.token_repo import AccessTokenRepository
         from src.repos.user_repo import UserRepository
         from src.routes.health_controller import HealthController
         from src.routes.link_controller import LinkController
+        from src.routes.user_controller import UserController
+        from src.service.auth.authorization import AuthorizationService
         from src.service.database.dbpool import DBPool
 
         Context.context = self
@@ -28,11 +31,15 @@ class Context:
         self.user_repo = UserRepository(self.db)
         self.link_repo = LinkRepository(self.db)
         self.stat_repo = StatRepository(self.db)
+        self.token_repo = AccessTokenRepository(self.db, self.user_repo)
+
+        self.auth = AuthorizationService(self.user_repo, self.token_repo)
 
         # controllers
         self.controllers = [
             HealthController(self.db),
             LinkController(self.link_repo),
+            UserController(self.user_repo, self.auth),
         ]
 
     async def initialize(self):
