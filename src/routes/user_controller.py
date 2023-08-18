@@ -2,7 +2,7 @@ from json import JSONDecodeError
 
 from aiohttp import web
 from aiohttp.web import (HTTPBadRequest, HTTPConflict, HTTPForbidden,
-                         HTTPNotFound)
+                         HTTPNotAcceptable, HTTPNotFound)
 
 from src.helpers.uid_from_link import get_uid
 from src.repos.user_repo import UserRepository
@@ -15,6 +15,7 @@ class UserController:
             [
                 web.get("/api/v1/me", self.get_user_info),
                 web.get("/api/v1/user", self.all_users),
+                web.post("/api/v1/login", self.login_user),
                 web.post("/api/v1/user", self.create_user),
                 web.get("/api/v1/user/{user_uid}", self.get_user),
                 web.delete("/api/v1/user/{user_uid}", self.delete_user),
@@ -56,18 +57,31 @@ class UserController:
 
         raise HTTPForbidden(reason="Access denied")
 
+    async def login_user(self, req: web.Request):
+        try:
+            params = await req.json()
+        except JSONDecodeError:
+            raise HTTPBadRequest(reason="Provided JSON data isn't a valid JSON.")
+
+        email, password = params.get("email"), params.get("password")
+
+        token = await self.auth.login(email, password)
+        if not token:
+            raise HTTPNotAcceptable(reason="Invalid username or password.")
+
+        return token
+
     async def create_user(self, req: web.Request):
         try:
             params = await req.json()
         except JSONDecodeError:
             raise HTTPBadRequest(reason="Provided JSON data isn't a valid JSON.")
 
-        password = params.get("firstname")
+        password = params.get("password")
         username = params.get("username")
         email = params.get("email")
 
         # TODO sending an email to verify that the email is definitely correct
-
         token = await self.auth.register(username, password, email)
         if not token:
             raise HTTPConflict(reason="This username is already taken.")
