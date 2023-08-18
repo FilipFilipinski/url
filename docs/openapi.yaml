@@ -27,6 +27,18 @@ paths:
                   summary: Services are not properly working
                   value: { "status": "unhealthy","services": { "db": "fail" } }
 
+  /api/v1/login:
+    post:
+      description: Returns data about user and token.
+      responses:
+        201:
+          description: Operation successful.
+          content:
+            application/json:
+              examples:
+                  healthy:
+                    value: { "token": "02bcab15-a2bc-4367-9e41-2a23874c805d"}
+
   /api/v1/me:
     get:
       description: Returns data about user by the token.
