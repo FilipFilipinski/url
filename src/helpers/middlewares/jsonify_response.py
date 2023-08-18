@@ -1,3 +1,4 @@
+import traceback
 from datetime import datetime
 from json import JSONEncoder
 
@@ -70,5 +71,6 @@ async def jsonify_middleware(request, handler):
         # throw 500 on any other error
         msg = str(ex) or "No message was provided."
         logger.error(f"{request.path} | {type(ex).__name__}: {msg}")
+        traceback.print_exc()
 
         return web.json_response({"status": 500, "message": "Internal Server Error"}, status=500)
