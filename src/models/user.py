@@ -8,7 +8,7 @@ class User(BaseModel):
     uid: UUID | None
     admin: bool = False
     email: str
-    password: str
+    password: str = Field(exclude=True)
     username: str
     date: datetime = Field(default_factory=datetime.now)
 
