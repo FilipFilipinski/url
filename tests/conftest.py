@@ -8,9 +8,10 @@ from faker import Faker
 from loguru import logger
 
 from src.app import async_app_factory
+from src.repos.token_repo import AccessTokenRepository
 from src.repos.user_repo import UserRepository
+from src.service.auth.authorization import AuthorizationService
 from src.service.database.dbpool import DBPool
-from tests.common import random_string
 
 faker = Faker()
 ph = PasswordHasher()
@@ -50,11 +51,32 @@ async def user_repo(db: DBPool):
     return repo
 
 
+@pytest.fixture(scope="module")
+async def token_repo(db: DBPool, user_repo: UserRepository):
+    token_repo = AccessTokenRepository(db, user_repo)
+    return token_repo
+
+
+@pytest.fixture(scope="module")
+async def auth(db: DBPool, user_repo: UserRepository, token_repo: AccessTokenRepository):
+    auth = AuthorizationService(user_repo, token_repo)
+    return auth
+
+
 @pytest.fixture(scope="module", autouse=True)
 async def example_user(user_repo: UserRepository):
     username = str(faker.first_name())
     email = faker.email()
-    password = random_string()
+    password = "random"
     user = await user_repo.create(email=email, password=password, username=username)
     yield user
-    await user_repo.delete(user.uid)
+
+
+@pytest.fixture(scope="module", autouse=True)
+async def example_user_admin(user_repo: UserRepository):
+    username = str(faker.first_name()) + "admin"
+    email = faker.email() + ".admin"
+    password = "random"
+    user = await user_repo.create(email=email, password=password, username=username)
+    await user_repo.change_admin_status(uid=user.uid)
+    yield await user_repo.find(uid=user.uid)
