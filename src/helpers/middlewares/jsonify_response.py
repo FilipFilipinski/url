@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 from datetime import datetime
 from json import JSONEncoder
@@ -43,6 +44,13 @@ async def jsonify_middleware(request, handler):
             # when do we need this?? (can be tricky if somebody accidentally sends a tuple instead of a list)
             # ok -- so idea is to use this with (response,stats); why hot have custom HttpResponse(response,status)?
             return web.json_response(res[0], dumps=NestedSerializer().encode, status=res[1])
+        elif asyncio.iscoroutine(res):
+            logger.warning(
+                "You probably wanted to return a value, but we've received as Coroutine instead. "
+                f"You might want to add `await` before the returning function call. (func: {handler.__name__})"
+            )
+            pass
+
         return web.json_response(res, dumps=NestedSerializer().encode)
 
     except web.HTTPException as ex:
