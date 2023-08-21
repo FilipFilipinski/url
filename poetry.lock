@@ -19,6 +19,17 @@ yarl = ">=1.0,<2.0"
 speedups = ["Brotli", "aiodns", "cchardet"]
 
 [[package]]
+name = "aiohttp-cors"
+version = "0.7.0"
+description = "CORS support for aiohttp"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+aiohttp = ">=1.1"
+
+[[package]]
 name = "aiohttp-devtools"
 version = "1.0.post0"
 description = "Dev tools for aiohttp"
@@ -877,7 +888,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "267cf07c22b6565fa7af6e5793b0365dffe2c7ca36d8e16469ceda2cf8289e74"
+content-hash = "9c378a666ea96a3bcbfa8f52002684e3912437739c74ab6e86f4a9b9614d842e"
 
 [metadata.files]
 aiohttp = [
@@ -968,6 +979,10 @@ aiohttp = [
     {file = "aiohttp-3.8.5-cp39-cp39-win32.whl", hash = "sha256:00ad4b6f185ec67f3e6562e8a1d2b69660be43070bd0ef6fcec5211154c7df67"},
     {file = "aiohttp-3.8.5-cp39-cp39-win_amd64.whl", hash = "sha256:c0a9034379a37ae42dea7ac1e048352d96286626251862e448933c0f59cbd79c"},
     {file = "aiohttp-3.8.5.tar.gz", hash = "sha256:b9552ec52cc147dbf1944ac7ac98af7602e51ea2dcd076ed194ca3c0d1c7d0bc"},
+]
+aiohttp-cors = [
+    {file = "aiohttp-cors-0.7.0.tar.gz", hash = "sha256:4d39c6d7100fd9764ed1caf8cebf0eb01bf5e3f24e2e073fda6234bc48b19f5d"},
+    {file = "aiohttp_cors-0.7.0-py3-none-any.whl", hash = "sha256:0451ba59fdf6909d0e2cd21e4c0a43752bc0703d33fc78ae94d9d9321710193e"},
 ]
 aiohttp-devtools = [
     {file = "aiohttp-devtools-1.0.post0.tar.gz", hash = "sha256:f46a87b250a84bf8edca21c8b6991dc2b6145cdf0af8a08b73f5c92d48d85f01"},
