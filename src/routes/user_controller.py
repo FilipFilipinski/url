@@ -14,11 +14,12 @@ class UserController:
         app.add_routes(
             [
                 web.get("/api/v1/me", self.get_user_info),
-                web.get("/api/v1/user", self.all_users),
                 web.post("/api/v1/login", self.login_user),
+                web.get("/api/v1/user", self.all_users),
                 web.post("/api/v1/user", self.create_user),
                 web.get("/api/v1/user/{user_uid}", self.get_user),
                 web.delete("/api/v1/user/{user_uid}", self.delete_user),
+                web.put("/api/v1/user/{user_uid}", self.change_admin),
             ]
         )
 
@@ -91,10 +92,14 @@ class UserController:
     # Admin panel
 
     async def delete_user(self, req: web.Request):
-        if await self.auth.with_auth(req):
-            user_uid = await get_uid(req, "user_id")
+        user = await self.auth.with_auth(req)
+        user_uid = await get_uid(req, "user_uid")
+
+        # Only admin and user can remove account
+        if user.admin or user.uid == user_uid:
+
             if await self.user.find(uid=user_uid):
-                if await self.user.delete(user_uid=user_uid):
+                if await self.user.delete(uid=user_uid):
                     return {"message": "User was successfully removed"}, 200
 
             raise HTTPNotFound(reason="Username does not exists.")
@@ -106,4 +111,11 @@ class UserController:
             if user:
                 return user
             return None
+        raise HTTPForbidden(reason="Access denied")
+
+    async def change_admin(self, req: web.Request):
+        user_uid = await get_uid(req, "user_uid")
+
+        if (await self.auth.with_auth(req)).admin:
+            return await self.user.change_admin_status(uid=user_uid)
         raise HTTPForbidden(reason="Access denied")
