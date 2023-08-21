@@ -96,7 +96,7 @@ paths:
                 $ref: "#/components/schemas/AccessToken"
 
   /api/v1/user/{user_uid}:
-    get:
+    qget:
       tags:
         - Admin
       description: Returns data about user by id.
