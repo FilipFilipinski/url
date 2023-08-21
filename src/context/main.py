@@ -1,5 +1,6 @@
 import os
 
+import aiohttp_cors
 from dotenv import load_dotenv
 from loguru import logger
 
@@ -60,6 +61,20 @@ class Context:
             controller.register(self.app)
 
         await setup_middlewares(self.app)
+
+        cors = aiohttp_cors.setup(
+            self.app,
+            defaults={
+                "*": aiohttp_cors.ResourceOptions(
+                    allow_credentials=True,
+                    expose_headers="*",
+                    allow_headers="*",
+                )
+            },
+        )
+
+        for route in list(self.app.router.routes()):
+            cors.add(route)
 
     async def initialize_db(self):
         db_url = os.getenv("DATABASE_URL", None)
