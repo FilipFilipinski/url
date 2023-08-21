@@ -63,16 +63,17 @@ async def auth(db: DBPool, user_repo: UserRepository, token_repo: AccessTokenRep
     return auth
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def example_user(user_repo: UserRepository):
     username = str(faker.first_name())
     email = faker.email()
     password = "random"
     user = await user_repo.create(email=email, password=password, username=username)
     yield user
+    await user_repo.delete(uid=user.uid)
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def example_user_admin(user_repo: UserRepository):
     username = str(faker.first_name()) + "admin"
     email = faker.email() + ".admin"
@@ -80,3 +81,4 @@ async def example_user_admin(user_repo: UserRepository):
     user = await user_repo.create(email=email, password=password, username=username)
     await user_repo.change_admin_status(uid=user.uid)
     yield await user_repo.find(uid=user.uid)
+    await user_repo.delete(uid=user.uid)
