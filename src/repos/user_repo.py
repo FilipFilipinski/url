@@ -140,7 +140,7 @@ class UserRepository(DB):
 
         resp = await conn.fetch(
             """--sql
-            SELECT * FROM users WHERE LOWER(firstname) LIKE $1 OR
+            SELECT * FROM users WHERE
             LOWER(email) LIKE $1 OR LOWER(username) LIKE $1
             ORDER BY created_at DESC LIMIT $2 OFFSET $3
             """,
@@ -161,6 +161,7 @@ class UserRepository(DB):
         Returns:
           result (bool): True if User is admin or False if not
         """
+
         if not await self.find(uid=uid):
             return False
 
@@ -173,7 +174,6 @@ class UserRepository(DB):
             """,
             uid,
         )
-
         return admin
 
     @DB._call
@@ -192,8 +192,8 @@ class UserRepository(DB):
 
         count = await conn.fetchval(
             """--sql
-            SELECT count(*) FROM (SELECT * FROM users WHERE surname
-            LIKE $1 OR phone LIKE $1 OR mail LIKE $1
+            SELECT count(*) FROM (SELECT * FROM users WHERE
+            email LIKE $1 OR username LIKE $1
             LIMIT $2 OFFSET $3) subquery
             """,
             "%" + phrase + "%",
